@@ -1,0 +1,126 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  DOTNET_VERSION: "10.0.x"
+  DOCKERHUB_API_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/poll-survey-builder-api
+  DOCKERHUB_FRONTEND_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/poll-survey-builder-frontend
+
+jobs:
+  # ---------------------------------------------------------------------
+  # Backend: restore, static-analysis build, unit + integration tests
+  # ---------------------------------------------------------------------
+  backend-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore PollSurveyBuilder.sln
+
+      - name: Lint (dotnet format, style/analyzer check)
+        run: dotnet format PollSurveyBuilder.sln --verify-no-changes --verbosity diagnostic
+        continue-on-error: true # style nits shouldn't block the pipeline; see the annotation instead
+
+      - name: Build
+        run: dotnet build PollSurveyBuilder.sln --no-restore
+
+      - name: Run tests
+        run: dotnet test PollSurveyBuilder.sln --no-build --verbosity normal --collect:"XPlat Code Coverage"
+
+  # ---------------------------------------------------------------------
+  # Frontend: install, lint, build
+  # ---------------------------------------------------------------------
+  frontend-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+        env:
+          VITE_API_URL: ${{ vars.VITE_API_URL || 'http://localhost:5080' }}
+
+  # ---------------------------------------------------------------------
+  # Docker: build multi-stage images and push to Docker Hub (main branch only)
+  # ---------------------------------------------------------------------
+  docker-build-push:
+    needs: [backend-test, frontend-test]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build & push API image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: src/PollSurveyBuilder.API/Dockerfile
+          push: true
+          tags: |
+            ${{ env.DOCKERHUB_API_IMAGE }}:latest
+            ${{ env.DOCKERHUB_API_IMAGE }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build & push frontend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          file: frontend/Dockerfile
+          push: true
+          build-args: |
+            VITE_API_URL=${{ vars.VITE_API_URL }}
+          tags: |
+            ${{ env.DOCKERHUB_FRONTEND_IMAGE }}:latest
+            ${{ env.DOCKERHUB_FRONTEND_IMAGE }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ---------------------------------------------------------------------
+  # Deploy: trigger the PaaS deploy hooks (Render/Railway) after a successful push
+  # ---------------------------------------------------------------------
+  deploy:
+    needs: [docker-build-push]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger API deploy hook
+        run: curl -fsS -X POST "${{ secrets.RENDER_DEPLOY_HOOK_API }}"
+
+      - name: Trigger frontend deploy hook
+        run: curl -fsS -X POST "${{ secrets.RENDER_DEPLOY_HOOK_FRONTEND }}"
