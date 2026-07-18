@@ -50,6 +50,10 @@ namespace PollSurveyBuilder.Infrastructure
                 {
                     options.Configuration = redisConnection;
                     options.InstanceName = "pollsurvey:";
+                    options.ConfigurationOptions = StackExchange.Redis.ConfigurationOptions.Parse(redisConnection);
+                    options.ConfigurationOptions.AbortOnConnectFail = false;
+                    options.ConfigurationOptions.ConnectTimeout = 2000;
+                    options.ConfigurationOptions.SyncTimeout = 2000;
                 });
             }
             else

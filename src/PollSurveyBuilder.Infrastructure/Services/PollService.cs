@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Logging;
 using PollSurveyBuilder.Application.Common;
 using PollSurveyBuilder.Application.DTOs;
 using PollSurveyBuilder.Application.IServices;
@@ -14,11 +15,13 @@ namespace PollSurveyBuilder.Infrastructure.Services
     {
         private readonly AppDbContext _db;
         private readonly IDistributedCache _cache;
+        private readonly ILogger<PollService> _logger;
 
-        public PollService(AppDbContext db, IDistributedCache cache)
+        public PollService(AppDbContext db, IDistributedCache cache, ILogger<PollService> logger)
         {
             _db = db;
             _cache = cache;
+            _logger = logger;
         }
 
         private static string ResultsCacheKey(string code) => $"poll:results:{code}";
@@ -125,10 +128,21 @@ namespace PollSurveyBuilder.Infrastructure.Services
 
         public async Task<PollResultsDTO?> GetResultsAsync(string code)
         {
-            var cached = await _cache.GetStringAsync(ResultsCacheKey(code));
-            if (cached != null)
+            // Cache is a speed optimization, not a dependency - if Redis is down or
+            // misconfigured, fall straight through to the database rather than
+            // failing the whole request. See CacheResultsAsync/InvalidateResultsCacheAsync
+            // for the same guard on the write side.
+            try
             {
-                return JsonSerializer.Deserialize<PollResultsDTO>(cached);
+                var cached = await _cache.GetStringAsync(ResultsCacheKey(code));
+                if (cached != null)
+                {
+                    return JsonSerializer.Deserialize<PollResultsDTO>(cached);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Redis read failed for poll {Code}; falling back to database.", code);
             }
 
             var results = await ComputeResultsAsync(code);
@@ -176,14 +190,28 @@ namespace PollSurveyBuilder.Infrastructure.Services
 
         public async Task CacheResultsAsync(PollResultsDTO results)
         {
-            var options = new DistributedCacheEntryOptions()
-                .SetAbsoluteExpiration(TimeSpan.FromMinutes(10));
-            await _cache.SetStringAsync(ResultsCacheKey(results.Code), JsonSerializer.Serialize(results), options);
+            try
+            {
+                var options = new DistributedCacheEntryOptions()
+                    .SetAbsoluteExpiration(TimeSpan.FromMinutes(10));
+                await _cache.SetStringAsync(ResultsCacheKey(results.Code), JsonSerializer.Serialize(results), options);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Redis write failed for poll {Code}; results were still saved to the database.", results.Code);
+            }
         }
 
         public async Task InvalidateResultsCacheAsync(string code)
         {
-            await _cache.RemoveAsync(ResultsCacheKey(code));
+            try
+            {
+                await _cache.RemoveAsync(ResultsCacheKey(code));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Redis invalidate failed for poll {Code}; a stale cached result may be served until it expires.", code);
+            }
         }
 
         public async Task<bool> CloseAsync(string code, string userId)
