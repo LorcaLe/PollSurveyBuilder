@@ -170,8 +170,13 @@ app.Use(async (context, next) =>
         context.Response.Cookies.Append(cookieName, token, new CookieOptions
         {
             HttpOnly = true,
+            // In production the frontend and API live on different registrable domains
+            // (e.g. separate onrender.com subdomains, which the browser treats as
+            // cross-site), so the cookie needs SameSite=None to be sent on fetch/XHR
+            // requests at all. SameSite=None requires Secure=true, which is why this
+            // stays Lax/non-secure only for local HTTP development.
             Secure = !app.Environment.IsDevelopment(),
-            SameSite = SameSiteMode.Lax,
+            SameSite = app.Environment.IsDevelopment() ? SameSiteMode.Lax : SameSiteMode.None,
             Expires = DateTimeOffset.UtcNow.AddYears(1),
         });
     }
