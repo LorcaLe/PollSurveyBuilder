@@ -43,7 +43,7 @@ export default function Dashboard() {
 
       {polls && polls.length === 0 && (
         <div className="card" style={{ maxWidth: 420 }}>
-          <p style={{ color: 'var(--text-dim)' }}>You haven't created any polls yet.</p>
+          <p style={{ color: 'var(--text-dim)' }}>{"You haven't created any polls yet."}</p>
           <Link to="/create" className="btn btn-primary">Create your first poll</Link>
         </div>
       )}

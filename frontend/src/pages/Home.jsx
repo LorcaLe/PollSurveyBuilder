@@ -17,8 +17,7 @@ export default function Home() {
         Ask a question. Watch the bars fill in <span style={{ color: 'var(--gold)' }}>live</span>.
       </h1>
       <p style={{ color: 'var(--text-dim)', maxWidth: 480, marginBottom: 28 }}>
-        Create a poll, share the link or QR code, and see every vote land on the results
-        page the instant it's cast — powered by SignalR.
+        {"Create a poll, share the link or QR code, and see every vote land on the results page the instant it's cast — powered by SignalR."}
       </p>
 
       <div style={{ display: 'flex', gap: 12, marginBottom: 40, flexWrap: 'wrap' }}>

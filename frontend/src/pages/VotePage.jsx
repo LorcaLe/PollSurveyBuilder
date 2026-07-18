@@ -59,7 +59,7 @@ export default function VotePage() {
       <div className="card" style={{ maxWidth: 460 }}>
         <div className="eyebrow">Already counted</div>
         <h2>{poll.question}</h2>
-        <p style={{ color: 'var(--text-dim)' }}>You've already voted on this poll from this browser.</p>
+        <p style={{ color: 'var(--text-dim)' }}>{"You've already voted on this poll from this browser."}</p>
         <button className="btn btn-primary" onClick={() => navigate(`/poll/${code}/results`)}>
           See live results
         </button>
