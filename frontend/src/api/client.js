@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { getVoterToken } from './voterToken'
 
 // Vite exposes env vars prefixed with VITE_ - set VITE_API_URL in frontend/.env
 // (see .env.example). Falls back to the local dev API port.
@@ -6,7 +7,6 @@ export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:50
 
 const client = axios.create({
   baseURL: API_BASE_URL,
-  withCredentials: true, // sends/receives the voter_token cookie
 })
 
 client.interceptors.request.use((config) => {
@@ -14,6 +14,9 @@ client.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
+  // Anonymous "one vote per browser" identity - see voterToken.js for why this
+  // is a header backed by localStorage instead of a cookie.
+  config.headers['X-Voter-Token'] = getVoterToken()
   return config
 })
 

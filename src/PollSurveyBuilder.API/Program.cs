@@ -83,19 +83,9 @@ builder.Services
     });
 builder.Services.AddAuthorization();
 
-builder.Services.ConfigureApplicationCookie(options =>
-{
-    options.Events.OnRedirectToLogin = context =>
-    {
-        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-        return Task.CompletedTask;
-    };
-});
-
-// ---- CORS: the React SPA runs on a different origin, and voting relies on a
-// cookie (voter_token), so credentials must be explicitly allowed. ----
-var allowedOrigin = builder.Configuration["Cors:AllowedOrigins"] ?? "https://ballote.vercel.app";
-string[] allowedOrigins = { allowedOrigin };
+// ---- CORS: the React SPA runs on a different origin. ----
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+    ?? new[] { "http://localhost:5173" };
 
 builder.Services.AddCors(options =>
 {
@@ -156,35 +146,6 @@ else
 }
 
 app.UseCors("Frontend");
-
-// Every visitor (voter or creator) gets a stable anonymous voter_token cookie the
-// first time they hit the API. VotesController relies on this to enforce
-// one-vote-per-browser without requiring an account.
-app.Use(async (context, next) =>
-{
-    const string cookieName = "voter_token";
-    var token = context.Request.Cookies[cookieName];
-    if (string.IsNullOrEmpty(token))
-    {
-        token = Guid.NewGuid().ToString("N");
-        context.Response.Cookies.Append(cookieName, token, new CookieOptions
-        {
-            HttpOnly = true,
-            // In production the frontend and API live on different registrable domains
-            // (e.g. separate onrender.com subdomains, which the browser treats as
-            // cross-site), so the cookie needs SameSite=None to be sent on fetch/XHR
-            // requests at all. SameSite=None requires Secure=true, which is why this
-            // stays Lax/non-secure only for local HTTP development.
-            Secure = !app.Environment.IsDevelopment(),
-            SameSite = app.Environment.IsDevelopment() ? SameSiteMode.Lax : SameSiteMode.None,
-            Expires = DateTimeOffset.UtcNow.AddYears(1),
-        });
-    }
-    // Stash it on HttpContext.Items so controllers can read it regardless of
-    // whether it was just-created (not yet in Request.Cookies) or pre-existing.
-    context.Items[cookieName] = token;
-    await next();
-});
 
 app.UseRateLimiter();
 

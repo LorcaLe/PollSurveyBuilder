@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using PollSurveyBuilder.Application.DTOs;
 using PollSurveyBuilder.Application.IServices;
@@ -20,7 +21,7 @@ namespace PollSurveyBuilder.Tests
                 .Options;
             var db = new AppDbContext(options);
             var cache = new MemoryDistributedCache(Options.Create(new MemoryDistributedCacheOptions()));
-            var pollService = new PollService(db, cache);
+            var pollService = new PollService(db, cache, NullLogger<PollService>.Instance);
             var voteService = new VoteService(db, pollService);
             return (db, pollService, voteService);
         }

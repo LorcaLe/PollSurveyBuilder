@@ -15,16 +15,15 @@ namespace PollSurveyBuilder.API.Controllers
         private readonly IPollService _pollService;
         private readonly IQRCodeService _qrCodeService;
         private readonly IValidator<CreatePollDTO> _createValidator;
-        private readonly IConfiguration _configuration;
 
-        public PollsController(IPollService pollService, IQRCodeService qrCodeService, IValidator<CreatePollDTO> createValidator, IConfiguration configuration)
+        public PollsController(IPollService pollService, IQRCodeService qrCodeService, IValidator<CreatePollDTO> createValidator)
         {
             _pollService = pollService;
             _qrCodeService = qrCodeService;
             _createValidator = createValidator;
-            _configuration = configuration;
         }
 
+        /// <summary>Creating a poll is the "Admin" action the coursework brief asks to protect with Identity.</summary>
         [HttpPost]
         [Authorize]
         [EnableRateLimiting("create-poll")]
@@ -35,8 +34,7 @@ namespace PollSurveyBuilder.API.Controllers
                 return ValidationProblem(BuildModelState(validation));
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            var baseUrl = _configuration["FrontendUrl"] ?? "https://ballote.vercel.app";
+            var baseUrl = $"{Request.Scheme}://{Request.Host}";
 
             var result = await _pollService.CreateAsync(dto, userId, baseUrl);
             return CreatedAtAction(nameof(GetForVoting), new { code = result.Code }, result);
@@ -45,7 +43,7 @@ namespace PollSurveyBuilder.API.Controllers
         [HttpGet("{code}")]
         public async Task<ActionResult<PollVoteViewDTO>> GetForVoting(string code)
         {
-            var voterToken = (string)(HttpContext.Items["voter_token"] ?? string.Empty);
+            var voterToken = Request.Headers["X-Voter-Token"].FirstOrDefault() ?? string.Empty;
             var poll = await _pollService.GetForVotingAsync(code, voterToken);
             return poll is null ? NotFound() : Ok(poll);
         }
@@ -63,9 +61,7 @@ namespace PollSurveyBuilder.API.Controllers
             var poll = await _pollService.GetForVotingAsync(code, "");
             if (poll is null) return NotFound();
 
-            var baseUrl = _configuration["FrontendUrl"] ?? "https://ballote.vercel.app";
-            var voteUrl = $"{baseUrl}/poll/{code}";
-
+            var voteUrl = $"{Request.Scheme}://{Request.Host}/poll/{code}";
             return Ok(new { dataUrl = _qrCodeService.GenerateBase64(voteUrl) });
         }
 

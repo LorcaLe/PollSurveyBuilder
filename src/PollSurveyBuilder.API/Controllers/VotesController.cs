@@ -31,7 +31,7 @@ namespace PollSurveyBuilder.API.Controllers
             if (!validation.IsValid)
                 return BadRequest(validation.Errors.Select(e => e.ErrorMessage));
 
-            var voterToken = (string)(HttpContext.Items["voter_token"] ?? string.Empty);
+            var voterToken = Request.Headers["X-Voter-Token"].FirstOrDefault() ?? string.Empty;
             if (string.IsNullOrEmpty(voterToken))
                 return BadRequest(new { message = "Missing voter identity." });
 
