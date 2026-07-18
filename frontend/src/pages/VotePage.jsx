@@ -59,7 +59,7 @@ export default function VotePage() {
       <div className="card" style={{ maxWidth: 460 }}>
         <div className="eyebrow">Already counted</div>
         <h2>{poll.question}</h2>
-        <p style={{ color: 'var(--text-dim)' }}>{"You've already voted on this poll from this browser."}</p>
+        <p style={{ color: 'var(--text-dim)' }}>You've already voted on this poll from this browser.</p>
         <button className="btn btn-primary" onClick={() => navigate(`/poll/${code}/results`)}>
           See live results
         </button>
@@ -82,6 +82,8 @@ export default function VotePage() {
 
   const canSubmit = poll.type === 'OpenText' ? textAnswer.trim().length > 0 : selectedOptionId != null
 
+  const selectedIndex = poll.options.findIndex(opt => opt.id === selectedOptionId)
+
   return (
     <div className="card" style={{ maxWidth: 520 }}>
       <div className="eyebrow">
@@ -90,40 +92,46 @@ export default function VotePage() {
       <h2>{poll.question}</h2>
 
       {poll.type === 'OpenText' ? (
-        <div className="field">
-          <label htmlFor="answer">Your answer</label>
-          <textarea
-            id="answer"
-            rows={4}
-            maxLength={1000}
-            value={textAnswer}
-            onChange={(e) => setTextAnswer(e.target.value)}
-            placeholder="Type your answer…"
-          />
-        </div>
-      ) : poll.type === 'Rating' ? (
-        <div style={{ display: 'flex', gap: 8, margin: '18px 0' }}>
-          {poll.options.map((opt, i) => (
-            <button
-              type="button"
-              key={opt.id}
-              onClick={() => setSelectedOptionId(opt.id)}
-              className="btn"
-              style={{
-                background: selectedOptionId === opt.id ? 'var(--gold)' : 'var(--panel-raised)',
-                color: selectedOptionId === opt.id ? '#241c05' : 'var(--text)',
-                fontSize: '1.3rem',
-                padding: '10px 16px',
-              }}
-              aria-label={`${i + 1} star`}
-            >
-              ★
-            </button>
-          ))}
-        </div>
-      ) : (
-        <div style={{ margin: '18px 0' }}>
-          {poll.options.map((opt) => (
+              <div className="field">
+                <label htmlFor="answer">Your answer</label>
+                <textarea
+                  id="answer"
+                  rows={4}
+                  maxLength={1000}
+                  value={textAnswer}
+                  onChange={(e) => setTextAnswer(e.target.value)}
+                  placeholder="Type your answer…"
+                />
+              </div>
+            ) : poll.type === 'Rating' ? (
+              <div style={{ display: 'flex', gap: 8, margin: '18px 0' }}>
+                {poll.options.map((opt, i) => {
+                  // Kiểm tra xem sao hiện tại (i) có nằm trước hoặc bằng sao đang chọn không
+                  const isActive = i <= selectedIndex; 
+                  
+                  return (
+                    <button
+                      type="button"
+                      key={opt.id}
+                      onClick={() => setSelectedOptionId(opt.id)}
+                      className="btn"
+                      style={{
+                        background: isActive ? 'var(--gradient)' : 'var(--surface-alt)',
+                        color: isActive ? '#fff' : 'var(--text)',
+                        border: isActive ? 'none' : '1px solid var(--border)',
+                        fontSize: '1.3rem',
+                        padding: '10px 16px',
+                      }}
+                      aria-label={`${i + 1} star`}
+                    >
+                      ★
+                    </button>
+                  )
+                })}
+              </div>
+            ) : (
+              <div style={{ margin: '18px 0' }}>
+                {poll.options.map((opt) => (
             <div
               key={opt.id}
               className={`ticket ${selectedOptionId === opt.id ? 'selected' : ''}`}

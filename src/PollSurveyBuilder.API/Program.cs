@@ -8,6 +8,7 @@ using PollSurveyBuilder.Application.Validators;
 using PollSurveyBuilder.Infrastructure;
 using Scalar.AspNetCore;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,15 +21,36 @@ builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<CreatePollValidator>();
 
 // ---- Controllers + OpenAPI ----
-builder.Services.AddControllers();
+// Enums (PollType, PollStatus) must serialize as strings ("SingleChoice", not 0) -
+// the React frontend compares against string names, and this keeps both
+// the REST responses and SignalR's JSON payloads consistent with each other.
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 builder.Services.AddOpenApi();
 
 // ---- SignalR (live vote broadcasting) ----
-builder.Services.AddSignalR();
+builder.Services.AddSignalR()
+    .AddJsonProtocol(options =>
+    {
+        options.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
 // ---- JWT auth (creator dashboard / poll management; voting itself never needs a login) ----
+// AddIdentity() (called inside AddInfrastructure above) registers its own cookie scheme
+// and quietly claims DefaultChallengeScheme for itself. Without explicitly overriding all
+// three scheme properties here, [Authorize] failures get handled by Identity's cookie
+// handler (redirecting to /Account/Login, a page that doesn't exist in this API-only
+// project) instead of returning a clean 401 from the JWT bearer handler.
 builder.Services
-    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
@@ -60,6 +82,15 @@ builder.Services
         };
     });
 builder.Services.AddAuthorization();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Events.OnRedirectToLogin = context =>
+    {
+        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+        return Task.CompletedTask;
+    };
+});
 
 // ---- CORS: the React SPA runs on a different origin, and voting relies on a
 // cookie (voter_token), so credentials must be explicitly allowed. ----
@@ -121,9 +152,8 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseHsts();
+    app.UseHttpsRedirection();
 }
-
-app.UseHttpsRedirection();
 
 app.UseCors("Frontend");
 

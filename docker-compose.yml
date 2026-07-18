@@ -37,7 +37,7 @@ services:
       redis:
         condition: service_healthy
     environment:
-      ASPNETCORE_ENVIRONMENT: "Production"
+      ASPNETCORE_ENVIRONMENT: "Development" 
       DatabaseProvider: "SqlServer"
       ConnectionStrings__Default: "Server=sqlserver;Database=PollSurveyBuilder;User Id=sa;Password=Lorcale2711@;TrustServerCertificate=True"
       ConnectionStrings__Redis: "redis:6379"

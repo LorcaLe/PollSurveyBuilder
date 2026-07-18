@@ -1,6 +1,6 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell, LabelList, ResponsiveContainer } from 'recharts'
 
-const BAR_COLORS = ['#f2b84b', '#4fd1c5', '#ef6a5a', '#8a7ff0', '#f2b84b', '#4fd1c5']
+const BAR_COLORS = ['#7c3aed', '#ec4899', '#fb923c', '#14b8a6', '#7c3aed', '#ec4899']
 
 /**
  * Recharts bar chart for the live results page. Re-renders whenever `options`
@@ -26,26 +26,26 @@ export default function PollBars({ options }) {
         layout="vertical"
         margin={{ top: 4, right: 48, left: 8, bottom: 4 }}
       >
-        <CartesianGrid strokeDasharray="3 3" stroke="#34324a" horizontal={false} />
-        <XAxis type="number" stroke="#9b98b3" tick={{ fontSize: 12, fill: '#9b98b3' }} allowDecimals={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke="#e9e6f4" horizontal={false} />
+        <XAxis type="number" stroke="#726d8c" tick={{ fontSize: 12, fill: '#726d8c' }} allowDecimals={false} />
         <YAxis
           type="category"
           dataKey="name"
           width={140}
-          stroke="#9b98b3"
-          tick={{ fontSize: 13, fill: '#ece9f7' }}
+          stroke="#726d8c"
+          tick={{ fontSize: 13, fill: '#1c1830' }}
         />
         <Tooltip
-          cursor={{ fill: 'rgba(242,184,75,0.08)' }}
-          contentStyle={{ background: '#262538', border: '1px solid #34324a', borderRadius: 8 }}
-          labelStyle={{ color: '#ece9f7' }}
+          cursor={{ fill: 'rgba(124,58,237,0.06)' }}
+          contentStyle={{ background: '#ffffff', border: '1px solid #e9e6f4', borderRadius: 8, boxShadow: '0 8px 24px rgba(28,24,48,0.08)' }}
+          labelStyle={{ color: '#1c1830' }}
           formatter={(value, _name, props) => [`${value} vote(s) · ${props.payload.percentage}%`, props.payload.fullName]}
         />
         <Bar dataKey="votes" radius={[0, 6, 6, 0]} isAnimationActive animationDuration={450}>
           {data.map((_, index) => (
             <Cell key={index} fill={BAR_COLORS[index % BAR_COLORS.length]} />
           ))}
-          <LabelList dataKey="votes" position="right" fill="#ece9f7" fontSize={12} />
+          <LabelList dataKey="votes" position="right" fill="#1c1830" fontSize={12} />
         </Bar>
       </BarChart>
     </ResponsiveContainer>

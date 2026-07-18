@@ -34,7 +34,7 @@ namespace PollSurveyBuilder.API.Controllers
                 return ValidationProblem(BuildModelState(validation));
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var baseUrl = $"{Request.Scheme}://{Request.Host}";
+            var baseUrl = "http://localhost:5173";
 
             var result = await _pollService.CreateAsync(dto, userId, baseUrl);
             return CreatedAtAction(nameof(GetForVoting), new { code = result.Code }, result);
@@ -61,7 +61,7 @@ namespace PollSurveyBuilder.API.Controllers
             var poll = await _pollService.GetForVotingAsync(code, "");
             if (poll is null) return NotFound();
 
-            var voteUrl = $"{Request.Scheme}://{Request.Host}/poll/{code}";
+            var voteUrl = $"http://localhost:5173/poll/{code}";
             return Ok(new { dataUrl = _qrCodeService.GenerateBase64(voteUrl) });
         }
 
