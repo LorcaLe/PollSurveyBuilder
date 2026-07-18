@@ -1,5 +1,5 @@
 import { Routes, Route } from 'react-router-dom'
-import Navbar from './components/Navbar.jsx'
+import Layout from './components/Layout.jsx' // Adjust the path if your Layout is in a different folder
 import Home from './pages/Home.jsx'
 import CreatePoll from './pages/CreatePoll.jsx'
 import VotePage from './pages/VotePage.jsx'
@@ -7,22 +7,24 @@ import ResultsPage from './pages/ResultsPage.jsx'
 import Dashboard from './pages/Dashboard.jsx'
 import Login from './pages/Login.jsx'
 import Register from './pages/Register.jsx'
+import Terms from './pages/Terms.jsx'
+import Privacy from './pages/Privacy.jsx'
 
 export default function App() {
   return (
-    <>
-      <Navbar />
-      <div className="shell">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/create" element={<CreatePoll />} />
-          <Route path="/poll/:code" element={<VotePage />} />
-          <Route path="/poll/:code/results" element={<ResultsPage />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-        </Routes>
-      </div>
-    </>
+    <Routes>
+      {/* The Layout component wraps all other routes as a parent route */}
+      <Route element={<Layout />}>
+        <Route path="/" element={<Home />} />
+        <Route path="/create" element={<CreatePoll />} />
+        <Route path="/poll/:code" element={<VotePage />} />
+        <Route path="/poll/:code/results" element={<ResultsPage />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<Privacy />} />
+      </Route>
+    </Routes>
   )
 }

@@ -15,15 +15,17 @@ namespace PollSurveyBuilder.API.Controllers
         private readonly IPollService _pollService;
         private readonly IQRCodeService _qrCodeService;
         private readonly IValidator<CreatePollDTO> _createValidator;
+        private readonly IConfiguration _configuration;
 
-        public PollsController(IPollService pollService, IQRCodeService qrCodeService, IValidator<CreatePollDTO> createValidator)
+        // Tiêm IConfiguration vào Constructor
+        public PollsController(IPollService pollService, IQRCodeService qrCodeService, IValidator<CreatePollDTO> createValidator, IConfiguration configuration)
         {
             _pollService = pollService;
             _qrCodeService = qrCodeService;
             _createValidator = createValidator;
+            _configuration = configuration;
         }
 
-        /// <summary>Creating a poll is the "Admin" action the coursework brief asks to protect with Identity.</summary>
         [HttpPost]
         [Authorize]
         [EnableRateLimiting("create-poll")]
@@ -34,7 +36,8 @@ namespace PollSurveyBuilder.API.Controllers
                 return ValidationProblem(BuildModelState(validation));
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var baseUrl = "http://localhost:5173";
+
+            var baseUrl = _configuration["FrontendUrl"] ?? "https://ballote.vercel.app";
 
             var result = await _pollService.CreateAsync(dto, userId, baseUrl);
             return CreatedAtAction(nameof(GetForVoting), new { code = result.Code }, result);
@@ -61,7 +64,9 @@ namespace PollSurveyBuilder.API.Controllers
             var poll = await _pollService.GetForVotingAsync(code, "");
             if (poll is null) return NotFound();
 
-            var voteUrl = $"http://localhost:5173/poll/{code}";
+            var baseUrl = _configuration["FrontendUrl"] ?? "https://ballote.vercel.app";
+            var voteUrl = $"{baseUrl}/poll/{code}";
+
             return Ok(new { dataUrl = _qrCodeService.GenerateBase64(voteUrl) });
         }
 
