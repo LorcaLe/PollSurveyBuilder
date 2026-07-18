@@ -94,8 +94,11 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 // ---- CORS: the React SPA runs on a different origin, and voting relies on a
 // cookie (voter_token), so credentials must be explicitly allowed. ----
-var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
-    ?? new[] { "http://localhost:5173" };
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
+if (allowedOrigins == null)
+{
+    Console.WriteLine("CORS: No configuration found! Defaulting to localhost.");
+}
 
 builder.Services.AddCors(options =>
 {
