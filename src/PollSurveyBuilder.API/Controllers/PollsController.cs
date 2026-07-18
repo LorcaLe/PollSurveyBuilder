@@ -17,7 +17,6 @@ namespace PollSurveyBuilder.API.Controllers
         private readonly IValidator<CreatePollDTO> _createValidator;
         private readonly IConfiguration _configuration;
 
-        // Tiêm IConfiguration vào Constructor
         public PollsController(IPollService pollService, IQRCodeService qrCodeService, IValidator<CreatePollDTO> createValidator, IConfiguration configuration)
         {
             _pollService = pollService;
