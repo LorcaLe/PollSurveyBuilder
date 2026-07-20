@@ -154,8 +154,6 @@ h1, h2, h3 {
   border-radius: var(--radius);
   padding: 30px;
   box-shadow: var(--shadow-md);
-  
-  /* Centers the card horizontally with a 40px top/bottom spacing */
   margin: 40px auto; 
 }
 
@@ -314,8 +312,6 @@ h1, h2, h3 {
   color: #e11d48; 
   margin-top: 6px; 
   font-weight: 500; 
-
-  /* Forces text to stay on a single line and adds an ellipsis (...) if it overflows */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

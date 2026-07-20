@@ -9,23 +9,23 @@ export default function Footer() {
         padding: '40px 24px 24px', 
         textAlign: 'center', 
         borderTop: '1px solid var(--border)',
-        marginTop: 'auto' // Pushes the footer to the bottom of its flex container
+        marginTop: 'auto'
       }}
     >
-      {/* Brand Logo - Centered */}
+
       <div className="brand" style={{ justifyContent: 'center', marginBottom: '20px' }}>
         <div className="stub"></div>
         Ballot
       </div>
 
-      {/* Navigation Links */}
+ 
       <div 
         style={{ 
           display: 'flex', 
           justifyContent: 'center', 
           gap: '24px', 
           marginBottom: '20px', 
-          flexWrap: 'wrap' // Allows links to wrap to the next line on very small screens
+          flexWrap: 'wrap'
         }}
       >
         <Link to="/terms" style={{ color: 'var(--text-dim)', fontSize: '0.9rem' }}>
@@ -39,7 +39,7 @@ export default function Footer() {
         </Link>
       </div>
 
-      {/* Copyright Information */}
+
       <p style={{ color: 'var(--text-dim)', fontSize: '0.85rem', margin: 0 }}>
         © {currentYear} Ballot. All rights reserved.
       </p>

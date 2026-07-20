@@ -39,7 +39,6 @@ namespace PollSurveyBuilder.API.Controllers
         private string FrontendBaseUrl =>
             _configuration["Frontend:BaseUrl"]?.TrimEnd('/') ?? $"{Request.Scheme}://{Request.Host}";
 
-        /// <summary>Creating a poll is the "Admin" action the coursework brief asks to protect with Identity.</summary>
         [HttpPost]
         [Authorize]
         [EnableRateLimiting("create-poll")]

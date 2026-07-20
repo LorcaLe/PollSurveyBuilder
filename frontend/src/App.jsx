@@ -1,5 +1,5 @@
 import { Routes, Route } from 'react-router-dom'
-import Layout from './components/Layout.jsx' // Adjust the path if your Layout is in a different folder
+import Layout from './components/Layout.jsx' 
 import Home from './pages/Home.jsx'
 import CreatePoll from './pages/CreatePoll.jsx'
 import VotePage from './pages/VotePage.jsx'
@@ -13,7 +13,6 @@ import Privacy from './pages/Privacy.jsx'
 export default function App() {
   return (
     <Routes>
-      {/* The Layout component wraps all other routes as a parent route */}
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/create" element={<CreatePoll />} />

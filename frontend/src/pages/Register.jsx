@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { authApi } from '../api/client'
 
-// Reusable SVG components
 const EyeIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
@@ -26,7 +25,6 @@ export default function Register() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('') 
   
-  // States to toggle visibility independently
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false) 
 
@@ -36,7 +34,6 @@ export default function Register() {
   async function handleSubmit(e) {
     e.preventDefault()
     
-    // Check if passwords match on the frontend before calling the API
     if (password !== confirmPassword) {
       setError('Passwords do not match.')
       return

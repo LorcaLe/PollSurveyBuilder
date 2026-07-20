@@ -2,11 +2,6 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell, LabelList, R
 
 const BAR_COLORS = ['#7c3aed', '#ec4899', '#fb923c', '#14b8a6', '#7c3aed', '#ec4899']
 
-/**
- * Recharts bar chart for the live results page. Re-renders whenever `options`
- * changes, which happens every time PollHub pushes a "resultsUpdated" event -
- * Recharts animates the bar height/width delta on its own.
- */
 export default function PollBars({ options }) {
   if (options.length === 0) {
     return <p className="helper">No votes yet — be the first to share this poll.</p>

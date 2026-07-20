@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { authApi } from '../api/client'
 
-// Inline SVG component for the Eye (Show) icon
 const EyeIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
@@ -10,7 +9,6 @@ const EyeIcon = () => (
   </svg>
 )
 
-// Inline SVG component for the Eye Slash (Hide) icon
 const EyeSlashIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
@@ -55,7 +53,6 @@ export default function Login() {
         
         <div className="field">
           <label htmlFor="password">Password</label>
-          {/* Wrap input in a relative div to position the eye icon absolute inside it */}
           <div style={{ position: 'relative' }}>
             <input 
               id="password" 
@@ -63,7 +60,7 @@ export default function Login() {
               required 
               value={password} 
               onChange={(e) => setPassword(e.target.value)} 
-              style={{ paddingRight: '40px' }} // Leave space for the icon on the right
+              style={{ paddingRight: '40px' }} 
             />
             <button
               type="button"
