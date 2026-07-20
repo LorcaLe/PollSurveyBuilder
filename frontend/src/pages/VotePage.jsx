@@ -59,7 +59,7 @@ export default function VotePage() {
       <div className="card" style={{ maxWidth: 460 }}>
         <div className="eyebrow">Already counted</div>
         <h2>{poll.question}</h2>
-        <p style={{ color: 'var(--text-dim)' }}>You've already voted on this poll from this browser.</p>
+        <p style={{ color: 'var(--text-dim)' }}>You have already voted on this poll from this browser.</p>
 
         {/* Updated button container with flexbox */}
         <div style={{ display: 'flex', gap: '10px' }}>
@@ -72,7 +72,11 @@ export default function VotePage() {
               const url = window.location.href;
               const shareData = { title: poll.question, text: 'Vote on this poll!', url };
               if (navigator.share && navigator.canShare(shareData)) {
-                try { await navigator.share(shareData); } catch (err) { }
+                try {
+                  await navigator.share(shareData);
+                } catch (err) {
+                  console.error('Share cancelled or failed', err);
+                }
               } else {
                 navigator.clipboard.writeText(url);
                 alert('Poll link copied to clipboard!');

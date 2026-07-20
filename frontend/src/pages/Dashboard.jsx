@@ -14,7 +14,7 @@ export default function Dashboard() {
       return
     }
     load()
-  }, [])
+  }, [navigate])
 
   function load() {
     pollApi.mine()

@@ -27,7 +27,7 @@ export default function Home() {
       </h1>
       <p style={{ color: 'var(--text-dim)', maxWidth: 480, marginBottom: 28, fontSize: '1.02rem' }}>
         Create a poll, share the link or QR code, and see every vote land on the results
-        page the instant it's cast — powered by SignalR.
+        page the instant it&apos;s cast
       </p>
 
       <div style={{ display: 'flex', gap: 12, marginBottom: 12, flexWrap: 'wrap' }}>

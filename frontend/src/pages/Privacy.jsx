@@ -16,7 +16,7 @@ export default function Privacy() {
       <ul style={{ paddingLeft: 20, marginBottom: 20 }}>
         <li style={{ marginBottom: 8 }}><strong>Account Information:</strong> When you register, we collect your Display Name, Email Address, and Password (which is securely hashed).</li>
         <li style={{ marginBottom: 8 }}><strong>Voting Data:</strong> When you vote on a poll, we may collect anonymous session data, device identifiers, or use Local Storage to prevent duplicate voting and ensure the integrity of the poll results.</li>
-        <li style={{ marginBottom: 8 }}><strong>Usage Data:</strong> We may collect basic diagnostic data (such as browser type or access times) to monitor and improve the app's performance.</li>
+        <li style={{ marginBottom: 8 }}><strong>Usage Data:</strong> We may collect basic diagnostic data (such as browser type or access times) to monitor and improve the app&apos;s performance.</li>
       </ul>
 
       {/* Section 2 */}
@@ -30,7 +30,7 @@ export default function Privacy() {
 
       {/* Section 3 */}
       <h3>3. Data Storage and Security</h3>
-      <p>We use an authentication token (JWT) stored in your browser's Local Storage to keep you logged in securely. We implement reasonable security measures to protect your personal information, but please remember that no method of transmission over the Internet is 100% secure.</p>
+      <p>We use an authentication token (JWT) stored in your browser&apos;s Local Storage to keep you logged in securely. We implement reasonable security measures to protect your personal information, but please remember that no method of transmission over the Internet is 100% secure.</p>
 
       {/* Section 4 */}
       <h3>4. Sharing of Information</h3>

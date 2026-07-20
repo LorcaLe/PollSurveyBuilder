@@ -11,7 +11,7 @@ export default function Terms() {
 
       {/* Section 1 */}
       <h3>1. Acceptance of Terms</h3>
-      <p>By accessing and using Ballot ("we", "our", or "us"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our application.</p>
+      <p>By accessing and using Ballot (&quot;we&quot;, &quot;our&quot;, or &quot;us&quot;), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our application.</p>
 
       {/* Section 2 */}
       <h3>2. User Accounts</h3>
@@ -36,7 +36,7 @@ export default function Terms() {
 
       {/* Section 6 */}
       <h3>6. Limitation of Liability</h3>
-      <p>Ballot is provided on an "as is" and "as available" basis. We do not guarantee that the service will be uninterrupted or error-free. We shall not be liable for any indirect, incidental, or consequential damages arising from your use of the service.</p>
+      <p>Ballot is provided on an &quot;as is&quot; and &quot;as available&quot; basis. We do not guarantee that the service will be uninterrupted or error-free. We shall not be liable for any indirect, incidental, or consequential damages arising from your use of the service.</p>
       
       {/* Navigation back to home */}
       <div style={{ marginTop: 40, textAlign: 'center' }}>
