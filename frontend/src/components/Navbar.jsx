@@ -1,8 +1,30 @@
 import { Link, useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 
 export default function Navbar() {
   const navigate = useNavigate()
-  const isLoggedIn = Boolean(localStorage.getItem('psb_token'))
+  const token = localStorage.getItem('psb_token')
+  const isLoggedIn = Boolean(token)
+
+  const [userName, setUserName] = useState('')
+
+  useEffect(() => {
+    if (token) {
+      try {
+
+        const payload = JSON.parse(atob(token.split('.')[1]))
+
+        const name = payload.name
+          || payload.unique_name
+          || payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name']
+          || 'User'
+
+        setUserName(name)
+      } catch (error) {
+        setUserName('User')
+      }
+    }
+  }, [token])
 
   function logout() {
     localStorage.removeItem('psb_token')
@@ -18,6 +40,11 @@ export default function Navbar() {
       <div className="nav-links">
         {isLoggedIn ? (
           <>
+
+            <span style={{ color: 'var(--violet)', fontWeight: 600, marginRight: '10px' }}>
+              Hi, {userName}!
+            </span>
+            
             <Link to="/dashboard">My polls</Link>
             <Link to="/create">New poll</Link>
             <button className="btn btn-ghost" onClick={logout}>Log out</button>

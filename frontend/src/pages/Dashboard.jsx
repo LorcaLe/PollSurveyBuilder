@@ -91,15 +91,16 @@ export default function Dashboard() {
                   <td className="mono">{p.totalVotes}</td>
                   <td className="helper">{new Date(p.createdAt).toLocaleDateString()}</td>
                   <td>
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      <button
-                        className="btn btn-ghost"
-                        onClick={() => handleShare(p.code, p.question)}
-                        style={{ padding: '6px 12px', fontSize: '0.85rem' }}
-                      >
-                        Share
-                      </button>
-                      {p.isOpen && (
+                    {p.isOpen && (
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <button
+                          className="btn btn-ghost"
+                          onClick={() => handleShare(p.code, p.question)}
+                          style={{ padding: '6px 12px', fontSize: '0.85rem' }}
+                        >
+                          Share
+                        </button>
+
                         <button
                           className="btn btn-ghost"
                           disabled={closingCode === p.code}
@@ -108,8 +109,8 @@ export default function Dashboard() {
                         >
                           {closingCode === p.code ? 'Closing…' : 'Close'}
                         </button>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))}
