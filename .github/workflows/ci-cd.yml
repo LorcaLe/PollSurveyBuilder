@@ -122,5 +122,3 @@ jobs:
       - name: Trigger API deploy hook
         run: curl -fsS -X POST "${{ secrets.RENDER_DEPLOY_HOOK_API }}"
 
-      - name: Trigger frontend deploy hook
-        run: curl -fsS -X POST "${{ secrets.RENDER_DEPLOY_HOOK_FRONTEND }}"
