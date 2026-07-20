@@ -13,13 +13,7 @@ export default function Navbar() {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]))
 
-        console.log("Token Payload:", payload)
-
-        const name = payload.displayName
-          || payload.name
-          || payload.unique_name
-          || payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name']
-          || 'User'
+        const name = payload.displayName || 'User'
 
         setUserName(name)
       } catch (error) {
