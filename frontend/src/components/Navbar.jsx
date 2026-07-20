@@ -11,10 +11,12 @@ export default function Navbar() {
   useEffect(() => {
     if (token) {
       try {
-
         const payload = JSON.parse(atob(token.split('.')[1]))
 
-        const name = payload.name
+        console.log("Token Payload:", payload)
+
+        const name = payload.displayName
+          || payload.name
           || payload.unique_name
           || payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name']
           || 'User'
@@ -44,7 +46,7 @@ export default function Navbar() {
             <span style={{ color: 'var(--violet)', fontWeight: 600, marginRight: '10px' }}>
               Hi, {userName}!
             </span>
-            
+
             <Link to="/dashboard">My polls</Link>
             <Link to="/create">New poll</Link>
             <button className="btn btn-ghost" onClick={logout}>Log out</button>
