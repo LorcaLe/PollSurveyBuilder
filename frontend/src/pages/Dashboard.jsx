@@ -32,6 +32,22 @@ export default function Dashboard() {
     }
   }
 
+  async function handleShare(code, question) {
+    const url = `${window.location.origin}/poll/${code}`
+    const shareData = {
+      title: question,
+      text: 'Join me in voting on this poll!',
+      url: url
+    }
+
+    if (navigator.share && navigator.canShare(shareData)) {
+      try { await navigator.share(shareData) } catch (err) { console.error(err) }
+    } else {
+      navigator.clipboard.writeText(url)
+      alert('Poll link copied to clipboard!')
+    }
+  }
+
   return (
     <div>
       <div className="eyebrow">Dashboard</div>
@@ -75,15 +91,25 @@ export default function Dashboard() {
                   <td className="mono">{p.totalVotes}</td>
                   <td className="helper">{new Date(p.createdAt).toLocaleDateString()}</td>
                   <td>
-                    {p.isOpen && (
+                    <div style={{ display: 'flex', gap: '8px' }}>
                       <button
                         className="btn btn-ghost"
-                        disabled={closingCode === p.code}
-                        onClick={() => handleClose(p.code)}
+                        onClick={() => handleShare(p.code, p.question)}
+                        style={{ padding: '6px 12px', fontSize: '0.85rem' }}
                       >
-                        {closingCode === p.code ? 'Closing…' : 'Close'}
+                        Share
                       </button>
-                    )}
+                      {p.isOpen && (
+                        <button
+                          className="btn btn-ghost"
+                          disabled={closingCode === p.code}
+                          onClick={() => handleClose(p.code)}
+                          style={{ padding: '6px 12px', fontSize: '0.85rem' }}
+                        >
+                          {closingCode === p.code ? 'Closing…' : 'Close'}
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}

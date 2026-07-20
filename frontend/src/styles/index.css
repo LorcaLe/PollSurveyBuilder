@@ -210,7 +210,7 @@ h1, h2, h3 {
   cursor: pointer;
   transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
 }
-.ticket::after {
+/* .ticket::after {
   content: '';
   position: absolute;
   right: -1px;
@@ -221,7 +221,7 @@ h1, h2, h3 {
   background: var(--bg);
   border-radius: 50%;
   border: 1.5px solid var(--border);
-}
+} */
 .ticket:hover { border-color: var(--pink); }
 .ticket.selected {
   border-color: var(--violet);

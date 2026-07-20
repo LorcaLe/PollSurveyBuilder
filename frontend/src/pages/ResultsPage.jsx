@@ -29,6 +29,21 @@ export default function ResultsPage() {
       </div>
     )
   }
+  const handleShare = async () => {
+    const url = `${window.location.origin}/poll/${code}`
+    const shareData = {
+      title: results?.question || 'Poll Results',
+      text: 'Check out these poll results!',
+      url: url
+    }
+
+    if (navigator.share && navigator.canShare(shareData)) {
+      try { await navigator.share(shareData) } catch (err) { console.error(err) }
+    } else {
+      navigator.clipboard.writeText(url)
+      alert('Poll link copied to clipboard!')
+    }
+  }
 
   if (!results) return <p className="helper">Loading results…</p>
 
@@ -61,6 +76,9 @@ export default function ResultsPage() {
 
       <div style={{ marginTop: 24, display: 'flex', gap: 10 }}>
         <Link to={`/poll/${code}`} className="btn btn-ghost">Back to voting page</Link>
+        <button className="btn btn-ghost" onClick={handleShare}>
+          Share Poll
+        </button>
       </div>
     </div>
   )

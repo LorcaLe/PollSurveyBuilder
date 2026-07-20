@@ -60,9 +60,28 @@ export default function VotePage() {
         <div className="eyebrow">Already counted</div>
         <h2>{poll.question}</h2>
         <p style={{ color: 'var(--text-dim)' }}>You've already voted on this poll from this browser.</p>
-        <button className="btn btn-primary" onClick={() => navigate(`/poll/${code}/results`)}>
-          See live results
-        </button>
+
+        {/* Updated button container with flexbox */}
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button className="btn btn-primary" onClick={() => navigate(`/poll/${code}/results`)}>
+            See live results
+          </button>
+          <button
+            className="btn btn-ghost"
+            onClick={async () => {
+              const url = window.location.href;
+              const shareData = { title: poll.question, text: 'Vote on this poll!', url };
+              if (navigator.share && navigator.canShare(shareData)) {
+                try { await navigator.share(shareData); } catch (err) { }
+              } else {
+                navigator.clipboard.writeText(url);
+                alert('Poll link copied to clipboard!');
+              }
+            }}
+          >
+            Share
+          </button>
+        </div>
       </div>
     )
   }
@@ -92,46 +111,46 @@ export default function VotePage() {
       <h2>{poll.question}</h2>
 
       {poll.type === 'OpenText' ? (
-              <div className="field">
-                <label htmlFor="answer">Your answer</label>
-                <textarea
-                  id="answer"
-                  rows={4}
-                  maxLength={1000}
-                  value={textAnswer}
-                  onChange={(e) => setTextAnswer(e.target.value)}
-                  placeholder="Type your answer…"
-                />
-              </div>
-            ) : poll.type === 'Rating' ? (
-              <div style={{ display: 'flex', gap: 8, margin: '18px 0' }}>
-                {poll.options.map((opt, i) => {
-                  // Kiểm tra xem sao hiện tại (i) có nằm trước hoặc bằng sao đang chọn không
-                  const isActive = i <= selectedIndex; 
-                  
-                  return (
-                    <button
-                      type="button"
-                      key={opt.id}
-                      onClick={() => setSelectedOptionId(opt.id)}
-                      className="btn"
-                      style={{
-                        background: isActive ? 'var(--gradient)' : 'var(--surface-alt)',
-                        color: isActive ? '#fff' : 'var(--text)',
-                        border: isActive ? 'none' : '1px solid var(--border)',
-                        fontSize: '1.3rem',
-                        padding: '10px 16px',
-                      }}
-                      aria-label={`${i + 1} star`}
-                    >
-                      ★
-                    </button>
-                  )
-                })}
-              </div>
-            ) : (
-              <div style={{ margin: '18px 0' }}>
-                {poll.options.map((opt) => (
+        <div className="field">
+          <label htmlFor="answer">Your answer</label>
+          <textarea
+            id="answer"
+            rows={4}
+            maxLength={1000}
+            value={textAnswer}
+            onChange={(e) => setTextAnswer(e.target.value)}
+            placeholder="Type your answer…"
+          />
+        </div>
+      ) : poll.type === 'Rating' ? (
+        <div style={{ display: 'flex', gap: 8, margin: '18px 0' }}>
+          {poll.options.map((opt, i) => {
+
+            const isActive = i <= selectedIndex;
+
+            return (
+              <button
+                type="button"
+                key={opt.id}
+                onClick={() => setSelectedOptionId(opt.id)}
+                className="btn"
+                style={{
+                  background: isActive ? 'var(--gradient)' : 'var(--surface-alt)',
+                  color: isActive ? '#fff' : 'var(--text)',
+                  border: isActive ? 'none' : '1px solid var(--border)',
+                  fontSize: '1.3rem',
+                  padding: '10px 16px',
+                }}
+                aria-label={`${i + 1} star`}
+              >
+                ★
+              </button>
+            )
+          })}
+        </div>
+      ) : (
+        <div style={{ margin: '18px 0' }}>
+          {poll.options.map((opt) => (
             <div
               key={opt.id}
               className={`ticket ${selectedOptionId === opt.id ? 'selected' : ''}`}
